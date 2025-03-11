@@ -1,50 +1,99 @@
-# Welcome to your Expo app 👋
+# MVP AI Scheduling & Learning Assistant
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## Overview
+This project is a **mobile AI scheduling and learning assistant** that helps users create flexible timetables, sync events with Google and apple Calendar, and recommend relevant learning resources (videos & definitions). The AI adapts based on user feedback to improve recommendations over time.
 
-## Get started
+---
 
-1. Install dependencies
+## 🚀 Tech Stack
+### **Frontend (Mobile App)**
+- **React Native (Expo)** – Cross-platform mobile development (Android & iOS)
+- **React Native Paper** – UI components for React Native
 
-   ```bash
-   npm install
-   ```
+### **Backend**
+- **Firebase** – Since it's an mvp
+- **Firebase Firestore** – Cloud database for storing user data
+- **Firebase Authentication** – Secure authentication (email/password login)
 
-2. Start the app
+### **APIs & Services**
+- **Google Calendar API** – Scheduling and event syncing
+- **YouTube Data API** – Fetching relevant learning videos
+- **Wikipedia API** – Fetching definitions and explanations
+- **Undecided LLM** – AI model for learning recommendations
 
-   ```bash
-    npx expo start
-   ```
+<!-- ### **Hosting & Deployment**
+- **Render/Vercel** – Free-tier backend hosting
+- **Expo** – Mobile app development & testing -->
 
-In the output, you'll find options to open the app in a
+---
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## 🛠️ Environment Setup
+### **1️⃣ Prerequisites**
+Make sure you have the following installed:
+- **Node.js (LTS version)** – [Download](https://nodejs.org/)
+- **Expo CLI** – `npm install -g expo-cli`
+- **Firebase CLI** – `npm install -g firebase-tools`
+- **Python (for AI Model - optional)** – [Download](https://www.python.org/)
+<!-- - **Ngrok (for testing APIs locally)** – [Download](https://ngrok.com/) -->
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+### **2️⃣ Clone the Repository**
+```sh
+git clone https://github.com/najadams/skejulamvp.git
+cd skejulamvp
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### **3️⃣ Install Dependencies**
+#### **Frontend (React Native)**
+```sh
+cd client
+npm install
+expo start
+```
+#### **Backend (Node.js + Express)**
+```sh
+cd server
+npm install
+npm start
+```
 
-## Learn more
+---
 
-To learn more about developing your project with Expo, look at the following resources:
+## 🔑 API Configuration
+Create a `.env` file in the backend directory and add:
+```env
+FIREBASE_API_KEY=your_firebase_api_key
+GOOGLE_CALENDAR_CLIENT_ID=your_google_client_id
+YOUTUBE_API_KEY=your_youtube_api_key
+WIKIPEDIA_API_URL=https://en.wikipedia.org/api/rest_v1/
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+---
 
-## Join the community
+## 📅 Features
+✅ AI-powered **smart scheduling**
+✅ **Google Calendar** event syncing
+✅ **Personalized learning resources**
+✅ **YouTube & Wikipedia API integration**
+✅ **Firebase Authentication** (Email/Password login)
 
-Join our community of developers creating universal apps.
+---
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## 📌 Next Steps
+- [ ] Implement AI-powered learning recommendations
+- [ ] Optimize Firebase Firestore structure
+- [ ] Improve UI/UX with animations
+- [ ] Deploy backend to Render
+
+---
+
+## 🤝 Contributing
+1. **Fork** the repo
+2. **Create a feature branch**: `git checkout -b feature-name`
+3. **Commit changes**: `git commit -m "Added new feature"`
+4. **Push to branch**: `git push origin feature-name`
+5. **Open a Pull Request**
+
+---
+
+## 📝 License
+This project is licensed under the **Bidams License**.
