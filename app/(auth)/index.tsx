@@ -10,9 +10,12 @@ import {
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useNavigation } from "@react-navigation/native";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import { authInstance } from "@/firebaseConfig";
 
 const AuthScreen = () => {
     const [isSignUp, setIsSignUp] = useState(false);
+    const [error, setError] = useState("");
     const navigation = useNavigation();
     useEffect(() => {
       navigation.setOptions({ headerShown: false }); // ✅ Hide header
@@ -26,8 +29,24 @@ const AuthScreen = () => {
   });
 
   const handleSubmit = (values: { email: string; password: string }) => {
-    console.log(values);
-    // Handle authentication logic here
+   isSignUp
+      ? createUserWithEmailAndPassword(authInstance, values.email, values.password)
+          .then((userCredential) => {
+            const user = userCredential.user;
+            console.log("User created: ", user);
+          })
+           .catch((error) => {
+               console.error(error);
+               setError(error.message);
+           })
+      : signInWithEmailAndPassword(authInstance, values.email, values.password)
+          .then((userCredential) => {
+            const user = userCredential.user;
+            console.log("User signed in: ", user);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
   };
 
   return (
@@ -38,6 +57,7 @@ const AuthScreen = () => {
         <Title style={styles.title}>{isSignUp ? "Sign Up" : "Sign In"}</Title>
       </View>
 
+        {error ? <Text style={styles.error}>{error}</Text> : null}
       <Formik
         initialValues={{ email: "", password: "" }}
         validationSchema={validationSchema}
