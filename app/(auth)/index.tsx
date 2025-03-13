@@ -1,58 +1,143 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useState, useEffect } from "react";
+import { View, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
+import {
+  TextInput,
+  Button,
+  Text,
+  Title,
+  ToggleButton,
+} from "react-native-paper";
+import { Formik } from "formik";
+import * as Yup from "yup";
+import { useNavigation } from "@react-navigation/native";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const AuthScreen = () => {
+    const [isSignUp, setIsSignUp] = useState(false);
+    const navigation = useNavigation();
+    useEffect(() => {
+      navigation.setOptions({ headerShown: false }); // ✅ Hide header
+    }, [navigation]);
 
-export default function HomeScreen() {
+  const validationSchema = Yup.object().shape({
+    email: Yup.string().email("Invalid email").required("Required"),
+    password: Yup.string()
+      .min(6, "Password must be at least 6 characters")
+      .required("Required"),
+  });
+
+  const handleSubmit = (values: { email: string; password: string }) => {
+    console.log(values);
+    // Handle authentication logic here
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Tabs folder 
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}>
+      <View style={styles.header}>
+        <Title style={styles.title}>{isSignUp ? "Sign Up" : "Sign In"}</Title>
+      </View>
+
+      <Formik
+        initialValues={{ email: "", password: "" }}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}>
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          errors,
+          touched,
+        }) => (
+          <View style={styles.form}>
+            <TextInput
+              label="Email"
+              mode="outlined"
+              onChangeText={handleChange("email")}
+              onBlur={handleBlur("email")}
+              value={values.email}
+              error={touched.email && !!errors.email}
+              style={styles.input}
+            />
+            {touched.email && errors.email && (
+              <Text style={styles.error}>{errors.email}</Text>
+            )}
+
+            <TextInput
+              label="Password"
+              mode="outlined"
+              secureTextEntry
+              onChangeText={handleChange("password")}
+              onBlur={handleBlur("password")}
+              value={values.password}
+              error={touched.password && !!errors.password}
+              style={styles.input}
+            />
+            {touched.password && errors.password && (
+              <Text style={styles.error}>{errors.password}</Text>
+            )}
+
+            <Button
+              mode="contained"
+              onPress={() => handleSubmit()}
+              style={styles.button}>
+              {isSignUp ? "Sign Up" : "Sign In"}
+            </Button>
+
+            <ToggleButton
+              icon={isSignUp ? "account-arrow-left" : "account-plus"}
+              onPress={() => setIsSignUp(!isSignUp)}
+              style={styles.toggleButton}
+            />
+            <Text style={styles.toggleText}>
+              {isSignUp
+                ? "Already have an account? Sign In"
+                : "Need an account? Sign Up"}
+            </Text>
+          </View>
+        )}
+      </Formik>
+    </KeyboardAvoidingView>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 20,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  header: {
+    alignItems: "center",
+    marginBottom: 20,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  form: {
+    marginBottom: 20,
+  },
+  input: {
+    marginBottom: 10,
+  },
+  button: {
+    marginTop: 10,
+  },
+  toggleButton: {
+    alignSelf: "center",
+    marginTop: 20,
+  },
+  toggleText: {
+    textAlign: "center",
+    marginTop: 10,
+  },
+  error: {
+    color: "red",
+    fontSize: 12,
+    marginBottom: 10,
   },
 });
+
+export default AuthScreen;
