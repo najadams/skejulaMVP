@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { View, ActivityIndicator } from "react-native";
+import { View, Text, ActivityIndicator } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import { auth } from "@/firebaseConfig";
 import { onAuthStateChanged, User } from "firebase/auth";
+import MainLayout from "./(main)/_layout";
 
 export default function AuthGuard() {
   const [user, setUser] = useState<User | null>(null);
@@ -14,8 +15,9 @@ export default function AuthGuard() {
       setUser(authenticatedUser);
       setCheckingAuth(false);
 
-      if (authenticatedUser) {
-        router.replace("/"); 
+      if (true) {
+        // router.replace("/(main)/dashboard"); 
+        router.replace("/about"); 
       } else {
         router.replace("/(auth)"); 
       }
@@ -32,5 +34,5 @@ export default function AuthGuard() {
     );
   }
 
-  return <Stack />;
+  return ;
 }

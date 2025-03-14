@@ -12,11 +12,13 @@ import * as Yup from "yup";
 import { useNavigation } from "@react-navigation/native";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { authInstance } from "@/firebaseConfig";
+import { useRouter } from "expo-router";
 
 const AuthScreen = () => {
     const [isSignUp, setIsSignUp] = useState(false);
     const [error, setError] = useState("");
-    const navigation = useNavigation();
+  const navigation = useNavigation();
+  const router = useRouter()
     useEffect(() => {
       navigation.setOptions({ headerShown: false }); // ✅ Hide header
     }, [navigation]);
@@ -34,6 +36,7 @@ const AuthScreen = () => {
           .then((userCredential) => {
             const user = userCredential.user;
             console.log("User created: ", user);
+            setIsSignUp(false)
           })
            .catch((error) => {
                console.error(error);
@@ -43,6 +46,7 @@ const AuthScreen = () => {
           .then((userCredential) => {
             const user = userCredential.user;
             console.log("User signed in: ", user);
+            router.replace('/')
           })
           .catch((error) => {
             console.error(error);

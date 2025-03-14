@@ -3,7 +3,6 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
-import { Stack } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme"; // If you use color scheme
 import AuthGuard from "./AuthGuard"; // ✅ Ensure correct import
 
