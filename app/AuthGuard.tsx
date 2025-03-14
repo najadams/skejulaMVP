@@ -3,7 +3,7 @@ import { View, Text, ActivityIndicator } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import { auth } from "@/firebaseConfig";
 import { onAuthStateChanged, User } from "firebase/auth";
-import MainLayout from "./(main)/_layout";
+import MainLayout from "./(main)/layout_test";
 
 export default function AuthGuard() {
   const [user, setUser] = useState<User | null>(null);
@@ -13,16 +13,16 @@ export default function AuthGuard() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authenticatedUser) => {
       setUser(authenticatedUser);
-      setCheckingAuth(false);
-
-      if (true) {
+      
+      if (authenticatedUser) {
         // router.replace("/(main)/dashboard"); 
-        router.replace("/about"); 
+        router.replace("/(main)/dashboard"); 
       } else {
-        router.replace("/(auth)"); 
+        router.replace("/(auth)/auth"); 
       }
     });
-
+    
+    setCheckingAuth(false);
     return () => unsubscribe();
   }, []);
 
@@ -34,5 +34,7 @@ export default function AuthGuard() {
     );
   }
 
-  return ;
+  if (user) {
+    return <MainLayout />;
+  }
 }

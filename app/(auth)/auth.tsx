@@ -46,7 +46,7 @@ const AuthScreen = () => {
           .then((userCredential) => {
             const user = userCredential.user;
             console.log("User signed in: ", user);
-            router.replace('/')
+            router.replace('/(main)/dashboard')
           })
           .catch((error) => {
             console.error(error);
