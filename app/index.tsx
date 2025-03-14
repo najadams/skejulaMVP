@@ -3,7 +3,7 @@ import React from 'react'
 
 const index = () => {
   return (
-    <Redirect href="/(main)/dashboard" />
+    <Redirect href="/(main)/(tabs)/dashboard" />
   )
 }
 
