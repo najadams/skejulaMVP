@@ -57,7 +57,7 @@ export default function AuthGuard() {
 
       if (authenticatedUser) {
         // Navigate directly to the tabs - this is the key change
-        router.replace("/(main)/(tabs)/dashboard");
+        router.replace("/(main)/(tabs)");
       } else {
         router.replace("/(auth)/auth");
       }

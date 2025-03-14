@@ -20,7 +20,7 @@ const AuthScreen = () => {
   const navigation = useNavigation();
   const router = useRouter()
     useEffect(() => {
-      navigation.setOptions({ headerShown: false }); // ✅ Hide header
+      navigation.setOptions({ headerShown: false }); // Hide header
     }, [navigation]);
 
   const validationSchema = Yup.object().shape({
@@ -46,7 +46,7 @@ const AuthScreen = () => {
           .then((userCredential) => {
             const user = userCredential.user;
             console.log("User signed in: ", user);
-            router.replace('/(main)/dashboard')
+            router.replace('/(main)/(tabs)')
           })
           .catch((error) => {
             console.error(error);
