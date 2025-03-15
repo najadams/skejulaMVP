@@ -1,15 +1,39 @@
 import React, { useEffect } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+} from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useUser } from "@/context/UserContext";
+import { useRouter } from "expo-router";
+import { auth } from "@/firebaseConfig";
+import { signOut } from "firebase/auth";
 
 const Dashboard = () => {
   // Properly destructure the user from the context
-  const { user } = useUser();
+  const { user, setUser } = useUser();
+  const router = useRouter();
 
-  useEffect(() => {
-    console.log(user, "this is user data");
-  }, [user]);
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      // Clear user data from context
+      setUser(null);
+      // Navigate to auth screen
+      router.replace("/(auth)/auth");
+    } catch (error) {
+      console.error("Error signing out: ", error);
+      Alert.alert(
+        "Logout Failed",
+        "There was a problem logging out. Please try again."
+      );
+    }
+  };
 
   // Add a null check to prevent errors if user is null
   if (!user) {
@@ -21,7 +45,7 @@ const Dashboard = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView  contentContainerStyle={ styles.container }>
       {/* Profile Picture Section */}
       <View style={styles.profileSection}>
         <Image
@@ -43,11 +67,13 @@ const Dashboard = () => {
         <TouchableOpacity style={styles.actionButton}>
           <Text style={styles.actionButtonText}>Edit Profile</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity
+          style={[styles.actionButton, styles.logoutButton]}
+          onPress={handleLogout}>
           <Text style={styles.actionButtonText}>Log Out</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -108,6 +134,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     marginBottom: 10,
+  },
+  logoutButton: {
+    backgroundColor: "#dc3545", // Red color for logout button
   },
   actionButtonText: {
     color: "#fff",

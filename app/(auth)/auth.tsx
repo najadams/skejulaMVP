@@ -51,8 +51,11 @@ const AuthScreen = () => {
               name: user.displayName || "User",
               email: user.email || "",
               role: "User", // Replace with actual role from Firestore
+              phone: user.phoneNumber || "",
+              emailverified: user.emailVerified,
+              isanonymous: user.isAnonymous,
               profilePicture:
-                user.photoURL || "https://via.placeholder.com/150",
+              user.photoURL || "https://via.placeholder.com/150",
             };
             setUser(userData);
 
