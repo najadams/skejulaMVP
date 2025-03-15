@@ -13,10 +13,12 @@ import { useNavigation } from "@react-navigation/native";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { authInstance } from "@/firebaseConfig";
 import { useRouter } from "expo-router";
+import { useUser } from "@/context/UserContext";
 
 const AuthScreen = () => {
-    const [isSignUp, setIsSignUp] = useState(false);
-    const [error, setError] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [error, setError] = useState("");
+  const { setUser } = useUser();
   const navigation = useNavigation();
   const router = useRouter()
     useEffect(() => {
@@ -45,7 +47,15 @@ const AuthScreen = () => {
       : signInWithEmailAndPassword(authInstance, values.email, values.password)
           .then((userCredential) => {
             const user = userCredential.user;
-            console.log("User signed in: ", user);
+            const userData = {
+              name: user.displayName || "User",
+              email: user.email || "",
+              role: "User", // Replace with actual role from Firestore
+              profilePicture:
+                user.photoURL || "https://via.placeholder.com/150",
+            };
+            setUser(userData);
+
             router.replace('/(main)/(tabs)')
           })
           .catch((error) => {

@@ -1,10 +1,11 @@
+import { UserProvider } from '@/context/UserContext'
 import { Redirect } from 'expo-router'
 import React from 'react'
 
-const index = () => {
+const Page = () => {
   return (
-    <Redirect href="/(main)/(tabs)" />
-  )
+      <Redirect href="/(main)/(tabs)" />
+  );
 }
 
-export default index
+export default Page
