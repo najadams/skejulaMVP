@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
+  SafeAreaView,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useUser } from "@/context/UserContext";
@@ -14,28 +15,20 @@ import { useRouter } from "expo-router";
 import { auth } from "@/firebaseConfig";
 import { signOut } from "firebase/auth";
 
-const Dashboard = () => {
-  // Properly destructure the user from the context
+const Settings = () => {
   const { user, setUser } = useUser();
   const router = useRouter();
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      // Clear user data from context
       setUser(null);
-      // Navigate to auth screen
       router.replace("/(auth)/auth");
     } catch (error) {
-      console.error("Error signing out: ", error);
-      Alert.alert(
-        "Logout Failed",
-        "There was a problem logging out. Please try again."
-      );
+      Alert.alert("Logout Failed", "There was a problem logging out.");
     }
   };
 
-  // Add a null check to prevent errors if user is null
   if (!user) {
     return (
       <View style={styles.container}>
@@ -45,7 +38,13 @@ const Dashboard = () => {
   }
 
   return (
-    <ScrollView  contentContainerStyle={ styles.container }>
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={styles.container}>
+      {/* Back Button */}
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <MaterialIcons name="arrow-back" size={24} color="#000" />
+      </TouchableOpacity>
+
       {/* Profile Picture Section */}
       <View style={styles.profileSection}>
         <Image
@@ -56,12 +55,14 @@ const Dashboard = () => {
           <MaterialIcons name="edit" size={24} color="#007BFF" />
         </TouchableOpacity>
       </View>
+
       {/* User Details Section */}
       <View style={styles.detailsSection}>
         <Text style={styles.userName}>{user.name}</Text>
         <Text style={styles.userEmail}>{user.email}</Text>
         <Text style={styles.userRole}>Role: {user.role}</Text>
       </View>
+
       {/* Quick Actions Section */}
       <View style={styles.actionsSection}>
         <TouchableOpacity style={styles.actionButton}>
@@ -73,22 +74,29 @@ const Dashboard = () => {
           <Text style={styles.actionButtonText}>Log Out</Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     backgroundColor: "#fff",
     padding: 20,
+    position: "relative",
+  },
+  backButton: {
+    position: "absolute",
+    top: 10,
+    left: 10,
+    padding: 10,
+    zIndex: 10,
   },
   profileSection: {
     alignItems: "center",
     marginBottom: 20,
-    position: "relative",
+    marginTop: 40, // Ensure content does not overlap back button
   },
   profileImage: {
     width: 120,
@@ -136,7 +144,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   logoutButton: {
-    backgroundColor: "#dc3545", // Red color for logout button
+    backgroundColor: "#dc3545",
   },
   actionButtonText: {
     color: "#fff",
@@ -145,4 +153,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Dashboard;
+export default Settings;

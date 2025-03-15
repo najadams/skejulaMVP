@@ -1,10 +1,12 @@
 import React, { useEffect } from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { useUser } from "@/context/UserContext";
+import { useRouter } from "expo-router";
 
 
 const Header = () => {
     const { user } = useUser();
+    const router = useRouter();
 
   return (
     <View
@@ -12,7 +14,7 @@ const Header = () => {
         flexDirection: "row",
         alignItems: "center",
         padding: 16,
-        backgroundColor: "#f0f0e1",
+        backgroundColor: "#fff",
       }}>
       <Image
         source={{
@@ -23,7 +25,7 @@ const Header = () => {
       <Text style={{ marginLeft: 8, fontSize: 18, fontWeight: "bold" }}>
         {user?.name || "User"}
       </Text>
-      <TouchableOpacity style={{ marginLeft: "auto" }}>
+      <TouchableOpacity style={{ marginLeft: "auto" }} onPress={() => {router.push("/settings")}}>
         <Text style={{ fontSize: 24 }}>⚙️</Text>
       </TouchableOpacity>
     </View>

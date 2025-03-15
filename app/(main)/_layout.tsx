@@ -8,9 +8,9 @@ export default function MainLayout() {
     <SafeAreaView style={{ flex: 1 }}>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)/auth" options={{ headerShown: false }} />
+        
         {/* Any other screens you want at the main level */}
       </Stack>
-      </SafeAreaView>
+    </SafeAreaView>
   );
 }
