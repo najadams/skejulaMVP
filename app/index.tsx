@@ -4,7 +4,7 @@ import React from 'react'
 
 const Page = () => {
   return (
-      <Redirect href="/(main)/(tabs)" />
+      <Redirect href="/(main)/(tabs)/home" />
   );
 }
 

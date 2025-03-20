@@ -5,12 +5,18 @@ import { SafeAreaView } from "react-native";
 
 export default function MainLayout() {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        
-        {/* Any other screens you want at the main level */}
-      </Stack>
-    </SafeAreaView>
+    <UserProvider>
+      <SafeAreaView style={{ flex: 1 }}>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="schedule" options={{ title: "Schedule" }} />
+          <Stack.Screen name="profile" options={{ title: "Profile" }} />
+          <Stack.Screen
+            name="notifications"
+            options={{ title: "Notifications" }}
+          />
+        </Stack>
+      </SafeAreaView>
+    </UserProvider>
   );
 }
