@@ -1,11 +1,18 @@
-import { UserProvider } from '@/context/UserContext'
-import { Redirect } from 'expo-router'
-import React from 'react'
+import { Redirect } from "expo-router";
+import React from "react";
+import { useUser } from "@/context/UserContext";
+import { UserStateType } from "@/constants/types";
 
-const Page = () => {
-  return (
-      <Redirect href="/(main)/(tabs)/home" />
-  );
+interface PageProps {
+  onUserUpdated: (user: UserStateType) => void;
 }
 
-export default Page
+const Page = () => {
+  // useEffect(() => {
+  //   onUserUpdated(user);
+  // }, [user, onUserUpdated]);
+
+  return <Redirect href="/(main)/(tabs)/home" />;
+};
+
+export default Page;

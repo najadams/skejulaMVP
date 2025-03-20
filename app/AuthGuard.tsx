@@ -2,32 +2,23 @@ import { useEffect, useState } from "react";
 import { View, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import { auth } from "@/firebaseConfig";
-import { onAuthStateChanged, User } from "firebase/auth";
-import { UserProvider } from "@/context/UserContext";
+import { onAuthStateChanged } from "firebase/auth";
+import { UserProvider, UserContextType } from "@/context/UserContext";
 import { Slot } from "expo-router";
+import Page from ".";
+import { UserStateType } from "@/constants/types";
 
 // Define the user type
-type UserStateType = {
-  name: string;
-  email: string;
-  phone: string;
-  emailverified: boolean;
-  isanonymous: boolean;
-  role: string;
-  profilePicture: string;
-} | null;
 
 export default function AuthGuard() {
   const [checkingAuth, setCheckingAuth] = useState(true);
   const router = useRouter();
-
-  // Initialize with proper type
-  const [initialUserState, setInitialUserState] = useState<UserStateType>(null);
+  const [initialUserState, setInitialUserState] =
+    useState<UserContextType>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authenticatedUser) => {
       if (authenticatedUser) {
-        // Set initial user state for context
         setInitialUserState({
           name: authenticatedUser.displayName || "User",
           email: authenticatedUser.email || "",
@@ -40,8 +31,7 @@ export default function AuthGuard() {
         });
 
         setCheckingAuth(false);
-        // Navigate to main tabs
-        router.replace("/(main)/(tabs)");
+        router.replace("/(main)/(tabs)/home");
       } else {
         setCheckingAuth(false);
         router.replace("/(auth)/auth");
@@ -59,10 +49,10 @@ export default function AuthGuard() {
     );
   }
 
-  // Use Slot to render child routes
   return (
     <UserProvider initialUser={initialUserState}>
       <Slot />
+      {/* <Page onUserUpdated={onUserUpdated} /> */}
     </UserProvider>
   );
 }

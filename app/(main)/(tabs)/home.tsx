@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,9 +8,24 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useUser } from "@/context/UserContext";
 
 export default function HomeScreen() {
-  const router = useRouter();
+    const user = useUser();
+    const router = useRouter();
+    const [welcome, setWelcome] = useState(true);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setWelcome(false)
+            if (user) {
+              console.log(user, "this is the user datea");
+            } else {
+              console.log("user aint defined");
+            }
+        }, 5000);
+        
+    },[user])
 
   const QuickAction = ({ icon, title, onPress }) => (
     <TouchableOpacity style={styles.quickAction} onPress={onPress}>
@@ -20,53 +35,63 @@ export default function HomeScreen() {
   );
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.welcomeText}>Welcome back!</Text>
-        <Text style={styles.subText}>Here's your schedule overview</Text>
+        <Text style={styles.headerTitle}>Dashboard</Text>
+        <TouchableOpacity style={styles.addButton}>
+          <Ionicons name="add-circle" size={24} color="#007AFF" />
+        </TouchableOpacity>
       </View>
-
-      <View style={styles.quickActions}>
-        <QuickAction
-          icon="calendar-outline"
-          title="Schedule"
-          onPress={() => router.push("/schedule")}
-        />
-        <QuickAction
-          icon="people-outline"
-          title="Find Tutor"
-          onPress={() => router.push("/tutors")}
-        />
-        <QuickAction
-          icon="book-outline"
-          title="My Lessons"
-          onPress={() => router.push("/schedule")}
-        />
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Upcoming Sessions</Text>
-        <View style={styles.sessionCard}>
-          <View style={styles.sessionInfo}>
-            <Text style={styles.sessionTitle}>Mathematics</Text>
-            <Text style={styles.sessionTime}>Today, 2:00 PM</Text>
+      <ScrollView style={styles.content}>
+        {welcome && (
+          <View style={styles.header}>
+            <Text style={styles.welcomeText}>Welcome back!</Text>
+            <Text style={styles.subText}>Here's your schedule overview</Text>
           </View>
-          <Ionicons name="chevron-forward" size={24} color="#8E8E93" />
-        </View>
-      </View>
+        )}
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Recent Progress</Text>
-        <View style={styles.progressCard}>
-          <Text style={styles.progressText}>
-            You've completed 3 sessions this week
-          </Text>
-          <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: "60%" }]} />
+        <View style={styles.quickActions}>
+          <QuickAction
+            icon="calendar-outline"
+            title="Schedule"
+            onPress={() => router.push("/schedule")}
+          />
+          <QuickAction
+            icon="people-outline"
+            title="Find Tutor"
+            onPress={() => router.push("/tutors")}
+          />
+          <QuickAction
+            icon="book-outline"
+            title="My Lessons"
+            onPress={() => router.push("/schedule")}
+          />
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Upcoming Sessions</Text>
+          <View style={styles.sessionCard}>
+            <View style={styles.sessionInfo}>
+              <Text style={styles.sessionTitle}>Mathematics</Text>
+              <Text style={styles.sessionTime}>Today, 2:00 PM</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={24} color="#8E8E93" />
           </View>
         </View>
-      </View>
-    </ScrollView>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Recent Progress</Text>
+          <View style={styles.progressCard}>
+            <Text style={styles.progressText}>
+              You've completed 3 sessions this week
+            </Text>
+            <View style={styles.progressBar}>
+              <View style={[styles.progressFill, { width: "60%" }]} />
+            </View>
+          </View>
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -75,9 +100,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F2F2F7",
   },
+  content: {
+    flex: 1,
+  },
   header: {
-    padding: 5,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 20,
     backgroundColor: "#FFFFFF",
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#000000",
+    },
+    addButton: {
+      padding:8
   },
   welcomeText: {
     fontSize: 28,

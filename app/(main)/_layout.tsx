@@ -5,7 +5,6 @@ import { SafeAreaView } from "react-native";
 
 export default function MainLayout() {
   return (
-    <UserProvider>
       <SafeAreaView style={{ flex: 1 }}>
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -17,6 +16,5 @@ export default function MainLayout() {
           />
         </Stack>
       </SafeAreaView>
-    </UserProvider>
   );
 }
