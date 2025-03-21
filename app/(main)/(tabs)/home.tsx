@@ -1,33 +1,65 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Dimensions,
+  Animated,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useUser } from "@/context/UserContext";
 
+interface QuickActionProps {
+  icon: keyof typeof Ionicons.glyphMap;
+  title: string;
+  onPress: () => void;
+}
+
 export default function HomeScreen() {
-    const user = useUser();
-    const router = useRouter();
-    const [welcome, setWelcome] = useState(true);
+  const user = useUser();
+  const router = useRouter();
+  const [welcome, setWelcome] = useState(true);
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  const contentSlideAnim = useRef(new Animated.Value(0)).current;
 
-    useEffect(() => {
-        setTimeout(() => {
-            setWelcome(false)
-            if (user) {
-              console.log(user, "this is the user datea");
-            } else {
-              console.log("user aint defined");
-            }
-        }, 5000);
-        
-    },[user])
+  useEffect(() => {
+    if (!welcome) {
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: -50,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(contentSlideAnim, {
+          toValue: -100,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [welcome]);
 
-  const QuickAction = ({ icon, title, onPress }) => (
+  useEffect(() => {
+    setTimeout(() => {
+      setWelcome(false);
+      if (user) {
+        console.log(user, "this is the user datea");
+      } else {
+        console.log("user aint defined");
+      }
+    }, 5000);
+  }, [user]);
+
+  const QuickAction = ({ icon, title, onPress }: QuickActionProps) => (
     <TouchableOpacity style={styles.quickAction} onPress={onPress}>
       <Ionicons name={icon} size={24} color="#007AFF" />
       <Text style={styles.quickActionText}>{title}</Text>
@@ -43,54 +75,69 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
       <ScrollView style={styles.content}>
-        {welcome && (
-          <View style={styles.header}>
-            <Text style={styles.welcomeText}>Welcome back!</Text>
-            <Text style={styles.subText}>Here's your schedule overview</Text>
+        <Animated.View
+          style={[
+            styles.header,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            },
+          ]}>
+          <Text style={styles.welcomeText}>Welcome back!</Text>
+          <Text style={styles.subText}>Here's your schedule overview</Text>
+        </Animated.View>
+
+        <Animated.View
+          style={{
+            transform: [{ translateY: contentSlideAnim }],
+          }}>
+          <View style={styles.quickActions}>
+            <QuickAction
+              icon="calendar-outline"
+              title="Schedule"
+              onPress={() => router.push("/schedule")}
+            />
+            <QuickAction
+              icon="people-outline"
+              title="Find Tutor"
+              onPress={() => router.push("/tutors")}
+            />
+            <QuickAction
+              icon="book-outline"
+              title="My Lessons"
+              onPress={() => router.push("/schedule")}
+            />
           </View>
-        )}
 
-        <View style={styles.quickActions}>
-          <QuickAction
-            icon="calendar-outline"
-            title="Schedule"
-            onPress={() => router.push("/schedule")}
-          />
-          <QuickAction
-            icon="people-outline"
-            title="Find Tutor"
-            onPress={() => router.push("/tutors")}
-          />
-          <QuickAction
-            icon="book-outline"
-            title="My Lessons"
-            onPress={() => router.push("/schedule")}
-          />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Upcoming Sessions</Text>
-          <View style={styles.sessionCard}>
-            <View style={styles.sessionInfo}>
-              <Text style={styles.sessionTitle}>Mathematics</Text>
-              <Text style={styles.sessionTime}>Today, 2:00 PM</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={24} color="#8E8E93" />
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recent Progress</Text>
-          <View style={styles.progressCard}>
-            <Text style={styles.progressText}>
-              You've completed 3 sessions this week
-            </Text>
-            <View style={styles.progressBar}>
-              <View style={[styles.progressFill, { width: "60%" }]} />
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Upcoming Sessions</Text>
+            <View style={styles.sessionCard}>
+              <View style={styles.sessionInfo}>
+                <Text style={styles.sessionTitle}>Mathematics</Text>
+                <Text style={styles.sessionTime}>Today, 2:00 PM</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={24} color="#8E8E93" />
             </View>
           </View>
-        </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Recent Progress</Text>
+            <View style={styles.progressCard}>
+              <Text style={styles.progressText}>
+                You've completed 3 sessions this week
+              </Text>
+              <View style={styles.progressBar}>
+                <View style={[styles.progressFill, { width: "60%" }]} />
+              </View>
+            </View>
+          </View>
+        </Animated.View>
       </ScrollView>
+      <TouchableOpacity
+        style={styles.aiFab}
+        onPress={() => router.push("/ai-chat" as any)}>
+        <Ionicons name="chatbubble-ellipses" size={24} color="#FFFFFF" />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -114,9 +161,9 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
     color: "#000000",
-    },
-    addButton: {
-      padding:8
+  },
+  addButton: {
+    padding: 8,
   },
   welcomeText: {
     fontSize: 28,
@@ -195,5 +242,24 @@ const styles = StyleSheet.create({
     height: "100%",
     backgroundColor: "#007AFF",
     borderRadius: 3,
+  },
+  aiFab: {
+    position: "absolute",
+    right: 20,
+    bottom: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "#007AFF",
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
 });
