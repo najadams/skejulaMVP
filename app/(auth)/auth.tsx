@@ -59,7 +59,7 @@ const AuthScreen = () => {
             };
             setUser(userData);
 
-            router.replace('/(main)/(tabs)')
+            router.replace('/(main)/(tabs)/home')
           })
           .catch((error) => {
             console.error(error);
