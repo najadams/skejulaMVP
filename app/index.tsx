@@ -8,10 +8,6 @@ interface PageProps {
 }
 
 const Page = () => {
-  // useEffect(() => {
-  //   onUserUpdated(user);
-  // }, [user, onUserUpdated]);
-
   return <Redirect href="/(main)/(tabs)/home" />;
 };
 
