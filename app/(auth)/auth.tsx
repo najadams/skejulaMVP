@@ -10,20 +10,24 @@ import {
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useNavigation } from "@react-navigation/native";
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
 import { authInstance } from "@/firebaseConfig";
 import { useRouter } from "expo-router";
-import { useUser } from "@/context/UserContext";
+import { useSetUser } from "@/context/UserContext";
 
 const AuthScreen = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState("");
-  const { setUser } = useUser();
+  const setUser = useSetUser();
   const navigation = useNavigation();
-  const router = useRouter()
-    useEffect(() => {
-      navigation.setOptions({ headerShown: false }); // Hide header
-    }, [navigation]);
+  const router = useRouter();
+
+  useEffect(() => {
+    navigation.setOptions({ headerShown: false }); // Hide header
+  }, [navigation]);
 
   const validationSchema = Yup.object().shape({
     email: Yup.string().email("Invalid email").required("Required"),
@@ -33,17 +37,21 @@ const AuthScreen = () => {
   });
 
   const handleSubmit = (values: { email: string; password: string }) => {
-   isSignUp
-      ? createUserWithEmailAndPassword(authInstance, values.email, values.password)
+    isSignUp
+      ? createUserWithEmailAndPassword(
+          authInstance,
+          values.email,
+          values.password
+        )
           .then((userCredential) => {
             const user = userCredential.user;
             console.log("User created: ", user);
-            setIsSignUp(false)
+            setIsSignUp(false);
           })
-           .catch((error) => {
-               console.error(error);
-               setError(error.message);
-           })
+          .catch((error) => {
+            console.error(error);
+            setError(error.message);
+          })
       : signInWithEmailAndPassword(authInstance, values.email, values.password)
           .then((userCredential) => {
             const user = userCredential.user;
@@ -55,11 +63,11 @@ const AuthScreen = () => {
               emailverified: user.emailVerified,
               isanonymous: user.isAnonymous,
               profilePicture:
-              user.photoURL || "https://via.placeholder.com/150",
+                user.photoURL || "https://via.placeholder.com/150",
             };
             setUser(userData);
 
-            router.replace('/(main)/(tabs)/home')
+            router.replace("/(main)/(tabs)/home");
           })
           .catch((error) => {
             console.error(error);
@@ -74,7 +82,7 @@ const AuthScreen = () => {
         <Title style={styles.title}>{isSignUp ? "Sign Up" : "Sign In"}</Title>
       </View>
 
-        {error ? <Text style={styles.error}>{error}</Text> : null}
+      {error ? <Text style={styles.error}>{error}</Text> : null}
       <Formik
         initialValues={{ email: "", password: "" }}
         validationSchema={validationSchema}
