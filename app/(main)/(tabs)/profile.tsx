@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -9,15 +9,35 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import {auth} from '../../../firebaseConfig'
+// import {auth, signOut} from '../../../firebaseConfig'
+import { getAuth, signOut } from "firebase/auth";
+import { MenuItemProps, Language } from "../../types/menu";
+import { LanguageModal } from "../../components/LanguageModal";
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const logout = () => {
+  const [isLanguageModalVisible, setIsLanguageModalVisible] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState("en");
 
-  }
+  const logout = async () => {
+    const auth = getAuth();
+    try {
+      console.log("signing out");
+      await signOut(auth);
+      console.log("User logged out successfully");
+      router.push("/(auth)/auth");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
 
-  const MenuItem = ({ icon, title, onPress }) => (
+  const handleLanguageSelect = (language: Language) => {
+    setCurrentLanguage(language.code);
+    // Here you would typically also update the app's language settings
+    // using a language management system like i18n
+  };
+
+  const MenuItem: React.FC<MenuItemProps> = ({ icon, title, onPress }) => (
     <TouchableOpacity style={styles.menuItem} onPress={onPress}>
       <View style={styles.menuItemLeft}>
         <Ionicons name={icon} size={24} color="#007AFF" />
@@ -69,7 +89,11 @@ export default function ProfileScreen() {
           title="Subject Preferences"
           onPress={() => {}}
         />
-        <MenuItem icon="language-outline" title="Language" onPress={() => {}} />
+        <MenuItem
+          icon="language-outline"
+          title="Language"
+          onPress={() => setIsLanguageModalVisible(true)}
+        />
       </View>
 
       <View style={styles.section}>
@@ -91,9 +115,16 @@ export default function ProfileScreen() {
         />
       </View>
 
-      <TouchableOpacity style={styles.logoutButton} onPress={() => logout()}>
+      <TouchableOpacity style={styles.logoutButton} onPress={logout}>
         <Text style={styles.logoutText}>Log Out</Text>
       </TouchableOpacity>
+
+      <LanguageModal
+        visible={isLanguageModalVisible}
+        onClose={() => setIsLanguageModalVisible(false)}
+        onSelectLanguage={handleLanguageSelect}
+        currentLanguage={currentLanguage}
+      />
     </ScrollView>
   );
 }

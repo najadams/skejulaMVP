@@ -1,37 +1,94 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
+  TextInput,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { TutorCard } from "../../components/TutorCard";
+import { Tutor } from "../../types/tutor";
+
+const mockTutors: Tutor[] = [
+  {
+    id: "1",
+    name: "John Smith",
+    subjects: ["Mathematics", "Physics"],
+    rating: 4.8,
+    experience: 5,
+    image: "https://randomuser.me/api/portraits/men/1.jpg",
+    description:
+      "Experienced tutor specializing in Mathematics and Physics. Helping students achieve their academic goals for over 5 years.",
+    hourlyRate: 50,
+    availability: ["Monday", "Wednesday", "Friday"],
+  },
+  {
+    id: "2",
+    name: "Sarah Johnson",
+    subjects: ["Chemistry", "Biology"],
+    rating: 4.9,
+    experience: 3,
+    image: "https://randomuser.me/api/portraits/women/1.jpg",
+    description:
+      "Passionate science tutor with expertise in Chemistry and Biology. Focused on making complex concepts easy to understand.",
+    hourlyRate: 45,
+    availability: ["Tuesday", "Thursday", "Saturday"],
+  },
+  {
+    id: "3",
+    name: "Michael Brown",
+    subjects: ["Computer Science", "Mathematics"],
+    rating: 4.7,
+    experience: 4,
+    image: "https://randomuser.me/api/portraits/men/2.jpg",
+    description:
+      "Tech-savvy tutor specializing in Computer Science and Mathematics. Helping students build strong programming foundations.",
+    hourlyRate: 55,
+    availability: ["Monday", "Thursday", "Friday"],
+  },
+];
 
 export default function TutorsScreen() {
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [tutors] = useState<Tutor[]>(mockTutors);
 
-  const TutorCard = ({ name, subjects, rating, experience, image }) => (
-    <TouchableOpacity style={styles.tutorCard}>
-      <Image source={{ uri: image }} style={styles.tutorImage} />
-      <View style={styles.tutorInfo}>
-        <Text style={styles.tutorName}>{name}</Text>
-        <View style={styles.subjectsContainer}>
-          {subjects.map((subject, index) => (
-            <View key={index} style={styles.subjectTag}>
-              <Text style={styles.subjectText}>{subject}</Text>
-            </View>
-          ))}
-        </View>
-        <View style={styles.ratingContainer}>
-          <Ionicons name="star" size={16} color="#FFD700" />
-          <Text style={styles.ratingText}>{rating}</Text>
-        </View>
-        <Text style={styles.experienceText}>{experience} years experience</Text>
-      </View>
-    </TouchableOpacity>
+  const filteredTutors = tutors.filter(
+    (tutor) =>
+      tutor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tutor.subjects.some((subject) =>
+        subject.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+  );
+
+  const handleTutorPress = (tutor: Tutor) => {
+    router.push(`/tutor/${tutor.id}`);
+  };
+
+  const renderSearchBar = () => (
+    <View style={styles.searchContainer}>
+      <Ionicons
+        name="search"
+        size={20}
+        color="#8E8E93"
+        style={styles.searchIcon}
+      />
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search tutors or subjects..."
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        placeholderTextColor="#8E8E93"
+      />
+      {searchQuery.length > 0 && (
+        <TouchableOpacity onPress={() => setSearchQuery("")}>
+          <Ionicons name="close-circle" size={20} color="#8E8E93" />
+        </TouchableOpacity>
+      )}
+    </View>
   );
 
   return (
@@ -43,34 +100,16 @@ export default function TutorsScreen() {
         </TouchableOpacity>
       </View>
 
+      {renderSearchBar()}
       <ScrollView style={styles.content}>
-        <View style={styles.searchBar}>
-          <Ionicons name="search" size={20} color="#8E8E93" />
-          <Text style={styles.searchText}>Search by subject or tutor name</Text>
-        </View>
-
         <View style={styles.tutorsList}>
-          <TutorCard
-            name="John Smith"
-            subjects={["Mathematics", "Physics"]}
-            rating={4.8}
-            experience={5}
-            image="https://randomuser.me/api/portraits/men/1.jpg"
-          />
-          <TutorCard
-            name="Sarah Johnson"
-            subjects={["Chemistry", "Biology"]}
-            rating={4.9}
-            experience={3}
-            image="https://randomuser.me/api/portraits/women/1.jpg"
-          />
-          <TutorCard
-            name="Michael Brown"
-            subjects={["Computer Science", "Mathematics"]}
-            rating={4.7}
-            experience={4}
-            image="https://randomuser.me/api/portraits/men/2.jpg"
-          />
+          {filteredTutors.map((tutor) => (
+            <TutorCard
+              key={tutor.id}
+              tutor={tutor}
+              onPress={handleTutorPress}
+            />
+          ))}
         </View>
       </ScrollView>
     </View>
@@ -100,83 +139,27 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-  searchBar: {
+  searchContainer: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#FFFFFF",
-    margin: 20,
-    padding: 12,
+    marginBottom: 0,
+    margin: 16,
+    paddingHorizontal: 12,
+    height: 40,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "#E5E5EA",
   },
-  searchText: {
-    marginLeft: 8,
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
     fontSize: 16,
-    color: "#8E8E93",
+    color: "#000000",
   },
   tutorsList: {
     padding: 20,
-  },
-  tutorCard: {
-    flexDirection: "row",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    padding: 15,
-    marginBottom: 15,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  tutorImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginRight: 15,
-  },
-  tutorInfo: {
-    flex: 1,
-  },
-  tutorName: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#000000",
-    marginBottom: 8,
-  },
-  subjectsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginBottom: 8,
-  },
-  subjectTag: {
-    backgroundColor: "#E8F5E9",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginRight: 8,
-    marginBottom: 4,
-  },
-  subjectText: {
-    fontSize: 12,
-    color: "#2E7D32",
-  },
-  ratingContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 4,
-  },
-  ratingText: {
-    fontSize: 14,
-    color: "#000000",
-    marginLeft: 4,
-  },
-  experienceText: {
-    fontSize: 14,
-    color: "#8E8E93",
   },
 });

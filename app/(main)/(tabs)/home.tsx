@@ -51,11 +51,6 @@ export default function HomeScreen() {
   useEffect(() => {
     setTimeout(() => {
       setWelcome(false);
-      if (user) {
-        console.log(user, "this is the user datea");
-      } else {
-        console.log("user aint defined");
-      }
     }, 5000);
   }, [user]);
 
