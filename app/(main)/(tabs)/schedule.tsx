@@ -15,8 +15,66 @@ import { Schedule, DaySchedule } from "../../types/schedule";
 export default function ScheduleScreen() {
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [isCalendarExpanded, setIsCalendarExpanded] = useState(true);
-  const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [isCalendarExpanded, setIsCalendarExpanded] = useState(false);
+
+  // Sample schedules data
+  const [schedules, setSchedules] = useState<Schedule[]>([
+    {
+      id: "1",
+      title: "Mathematics Tutoring",
+      startDate: new Date(new Date().setDate(new Date().getDate() + 1)),
+      endDate: new Date(new Date().setDate(new Date().getDate() + 1)),
+      time: "10:00 AM",
+      duration: 60,
+      type: "tutor",
+      tutor: "John Smith",
+      status: "confirmed",
+    },
+    {
+      id: "2",
+      title: "Physics Practice",
+      startDate: new Date(new Date().setDate(new Date().getDate() + 2)),
+      endDate: new Date(new Date().setDate(new Date().getDate() + 2)),
+      time: "2:30 PM",
+      duration: 45,
+      type: "ai",
+      tutor: "AI Learning with Reaven",
+      status: "pending",
+    },
+    {
+      id: "3",
+      title: "Chemistry Review",
+      startDate: new Date(new Date().setDate(new Date().getDate() + 3)),
+      endDate: new Date(new Date().setDate(new Date().getDate() + 3)),
+      time: "11:00 AM",
+      duration: 90,
+      type: "tutor",
+      tutor: "Sarah Johnson",
+      status: "confirmed",
+    },
+    {
+      id: "4",
+      title: "Biology Concepts",
+      startDate: new Date(new Date().setDate(new Date().getDate() + 5)),
+      endDate: new Date(new Date().setDate(new Date().getDate() + 5)),
+      time: "3:00 PM",
+      duration: 60,
+      type: "ai",
+      tutor: "AI Learning with Reaven",
+      status: "confirmed",
+    },
+    {
+      id: "5",
+      title: "Calculus Practice",
+      startDate: new Date(new Date().setDate(new Date().getDate() + 7)),
+      endDate: new Date(new Date().setDate(new Date().getDate() + 7)),
+      time: "1:00 PM",
+      duration: 75,
+      type: "tutor",
+      tutor: "Michael Brown",
+      status: "pending",
+    },
+  ]);
 
   // Mock tutors data - in a real app, this would come from an API
   const tutors = [
