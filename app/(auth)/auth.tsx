@@ -14,9 +14,10 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
 } from "firebase/auth";
-import { authInstance } from "@/firebaseConfig";
+import { authInstance, db } from "@/firebaseConfig";
 import { useRouter } from "expo-router";
 import { useSetUser } from "@/context/UserContext";
+import { doc, setDoc } from "firebase/firestore";
 
 const AuthScreen = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -34,44 +35,83 @@ const AuthScreen = () => {
     password: Yup.string()
       .min(6, "Password must be at least 6 characters")
       .required("Required"),
+    ...(isSignUp && {
+      name: Yup.string().required("Name is required"),
+      username: Yup.string()
+        .min(3, "Username must be at least 3 characters")
+        .required("Username is required"),
+      phone: Yup.string()
+        .matches(/^[0-9]{10}$/, "Phone number must be 10 digits")
+        .required("Phone number is required"),
+    }),
   });
 
-  const handleSubmit = (values: { email: string; password: string }) => {
-    isSignUp
-      ? createUserWithEmailAndPassword(
+  const handleSubmit = async (values: {
+    email: string;
+    password: string;
+    name?: string;
+    username?: string;
+    phone?: string;
+  }) => {
+    try {
+      if (isSignUp) {
+        // Create user with email and password
+        const userCredential = await createUserWithEmailAndPassword(
           authInstance,
           values.email,
           values.password
-        )
-          .then((userCredential) => {
-            const user = userCredential.user;
-            console.log("User created: ", user);
-            setIsSignUp(false);
-          })
-          .catch((error) => {
-            console.error(error);
-            setError(error.message);
-          })
-      : signInWithEmailAndPassword(authInstance, values.email, values.password)
-          .then((userCredential) => {
-            const user = userCredential.user;
-            const userData = {
-              name: user.displayName || "User",
-              email: user.email || "",
-              role: "User", // Replace with actual role from Firestore
-              phone: user.phoneNumber || "",
-              emailverified: user.emailVerified,
-              isanonymous: user.isAnonymous,
-              profilePicture:
-                user.photoURL || "https://via.placeholder.com/150",
-            };
-            setUser(userData);
+        );
+        const user = userCredential.user;
 
-            router.replace("/(main)/(tabs)/home");
-          })
-          .catch((error) => {
-            console.error(error);
-          });
+        // Create user document in Firestore
+        await setDoc(doc(db, "users", user.uid), {
+          name: values.name,
+          email: values.email,
+          username: values.username,
+          phone: values.phone,
+          role: "student",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+
+        // Update local user state
+        setUser({
+          name: values.name || "",
+          email: values.email,
+          phone: values.phone || "",
+          emailverified: user.emailVerified,
+          isanonymous: user.isAnonymous,
+          role: "student",
+          profilePicture: "https://via.placeholder.com/150",
+        });
+
+        setIsSignUp(false);
+      } else {
+        // Sign in
+        const userCredential = await signInWithEmailAndPassword(
+          authInstance,
+          values.email,
+          values.password
+        );
+        const user = userCredential.user;
+
+        // Update local user state
+        setUser({
+          name: user.displayName || "User",
+          email: user.email || "",
+          role: "User",
+          phone: user.phoneNumber || "",
+          emailverified: user.emailVerified,
+          isanonymous: user.isAnonymous,
+          profilePicture: user.photoURL || "https://via.placeholder.com/150",
+        });
+
+        router.replace("/(main)/(tabs)/home");
+      }
+    } catch (error: any) {
+      console.error(error);
+      setError(error.message);
+    }
   };
 
   return (
@@ -84,7 +124,13 @@ const AuthScreen = () => {
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <Formik
-        initialValues={{ email: "", password: "" }}
+        initialValues={{
+          email: "",
+          password: "",
+          name: "",
+          username: "",
+          phone: "",
+        }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}>
         {({
@@ -96,6 +142,50 @@ const AuthScreen = () => {
           touched,
         }) => (
           <View style={styles.form}>
+            {isSignUp && (
+              <>
+                <TextInput
+                  label="Name"
+                  mode="outlined"
+                  onChangeText={handleChange("name")}
+                  onBlur={handleBlur("name")}
+                  value={values.name}
+                  error={touched.name && !!errors.name}
+                  style={styles.input}
+                />
+                {touched.name && errors.name && (
+                  <Text style={styles.error}>{errors.name}</Text>
+                )}
+
+                <TextInput
+                  label="Username"
+                  mode="outlined"
+                  onChangeText={handleChange("username")}
+                  onBlur={handleBlur("username")}
+                  value={values.username}
+                  error={touched.username && !!errors.username}
+                  style={styles.input}
+                />
+                {touched.username && errors.username && (
+                  <Text style={styles.error}>{errors.username}</Text>
+                )}
+
+                <TextInput
+                  label="Phone"
+                  mode="outlined"
+                  onChangeText={handleChange("phone")}
+                  onBlur={handleBlur("phone")}
+                  value={values.phone}
+                  error={touched.phone && !!errors.phone}
+                  keyboardType="phone-pad"
+                  style={styles.input}
+                />
+                {touched.phone && errors.phone && (
+                  <Text style={styles.error}>{errors.phone}</Text>
+                )}
+              </>
+            )}
+
             <TextInput
               label="Email"
               mode="outlined"
@@ -104,6 +194,8 @@ const AuthScreen = () => {
               value={values.email}
               error={touched.email && !!errors.email}
               style={styles.input}
+              keyboardType="email-address"
+              autoCapitalize="none"
             />
             {touched.email && errors.email && (
               <Text style={styles.error}>{errors.email}</Text>
