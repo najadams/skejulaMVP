@@ -159,11 +159,13 @@ export default function ScheduleScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Schedule</Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => router.push("/add-schedule")}>
-          <Ionicons name="add-circle" size={24} color="#007AFF" />
-        </TouchableOpacity>
+        {!isCalendarExpanded && (
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => router.push("/add-schedule")}>
+            <Ionicons name="add-circle" size={24} color="#007AFF" />
+          </TouchableOpacity>
+        )}
       </View>
 
       <ScrollView style={styles.content}>
