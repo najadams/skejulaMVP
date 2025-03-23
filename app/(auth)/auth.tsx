@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
+import {
+  View,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
+} from "react-native";
 import {
   TextInput,
   Button,
@@ -22,6 +28,7 @@ import { doc, setDoc } from "firebase/firestore";
 const AuthScreen = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const setUser = useSetUser();
   const navigation = useNavigation();
   const router = useRouter();
@@ -36,7 +43,7 @@ const AuthScreen = () => {
       .min(6, "Password must be at least 6 characters")
       .required("Required"),
     ...(isSignUp && {
-      name: Yup.string().required("Name is required"),
+      name: Yup.string().required("Fullname is required"),
       username: Yup.string()
         .min(3, "Username must be at least 3 characters")
         .required("Username is required"),
@@ -54,6 +61,9 @@ const AuthScreen = () => {
     phone?: string;
   }) => {
     try {
+      setIsLoading(true);
+      setError("");
+
       if (isSignUp) {
         // Create user with email and password
         const userCredential = await createUserWithEmailAndPassword(
@@ -111,6 +121,8 @@ const AuthScreen = () => {
     } catch (error: any) {
       console.error(error);
       setError(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -145,13 +157,14 @@ const AuthScreen = () => {
             {isSignUp && (
               <>
                 <TextInput
-                  label="Name"
+                  label="Full Name"
                   mode="outlined"
                   onChangeText={handleChange("name")}
                   onBlur={handleBlur("name")}
                   value={values.name}
                   error={touched.name && !!errors.name}
                   style={styles.input}
+                  disabled={isLoading}
                 />
                 {touched.name && errors.name && (
                   <Text style={styles.error}>{errors.name}</Text>
@@ -165,6 +178,7 @@ const AuthScreen = () => {
                   value={values.username}
                   error={touched.username && !!errors.username}
                   style={styles.input}
+                  disabled={isLoading}
                 />
                 {touched.username && errors.username && (
                   <Text style={styles.error}>{errors.username}</Text>
@@ -179,6 +193,7 @@ const AuthScreen = () => {
                   error={touched.phone && !!errors.phone}
                   keyboardType="phone-pad"
                   style={styles.input}
+                  disabled={isLoading}
                 />
                 {touched.phone && errors.phone && (
                   <Text style={styles.error}>{errors.phone}</Text>
@@ -196,6 +211,7 @@ const AuthScreen = () => {
               style={styles.input}
               keyboardType="email-address"
               autoCapitalize="none"
+              disabled={isLoading}
             />
             {touched.email && errors.email && (
               <Text style={styles.error}>{errors.email}</Text>
@@ -210,6 +226,7 @@ const AuthScreen = () => {
               value={values.password}
               error={touched.password && !!errors.password}
               style={styles.input}
+              disabled={isLoading}
             />
             {touched.password && errors.password && (
               <Text style={styles.error}>{errors.password}</Text>
@@ -218,14 +235,23 @@ const AuthScreen = () => {
             <Button
               mode="contained"
               onPress={() => handleSubmit()}
-              style={styles.button}>
-              {isSignUp ? "Sign Up" : "Sign In"}
+              style={styles.button}
+              disabled={isLoading}
+              loading={isLoading}>
+              {isLoading ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : isSignUp ? (
+                "Sign Up"
+              ) : (
+                "Sign In"
+              )}
             </Button>
 
             <ToggleButton
               icon={isSignUp ? "account-arrow-left" : "account-plus"}
               onPress={() => setIsSignUp(!isSignUp)}
               style={styles.toggleButton}
+              disabled={isLoading}
             />
             <Text style={styles.toggleText}>
               {isSignUp
