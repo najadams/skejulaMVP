@@ -56,7 +56,7 @@ export default function HomeScreen() {
 
   const QuickAction = ({ icon, title, onPress }: QuickActionProps) => (
     <TouchableOpacity style={styles.quickAction} onPress={onPress}>
-      <Ionicons name={icon} size={24} color="#007AFF" />
+      <Ionicons name={icon} size={24} />
       <Text style={styles.quickActionText}>{title}</Text>
     </TouchableOpacity>
   );
@@ -65,9 +65,9 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Dashboard</Text>
-        <TouchableOpacity style={styles.addButton}>
+        {/* <TouchableOpacity style={styles.addButton}>
           <Ionicons name="add-circle" size={24} color="#007AFF" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       <ScrollView style={styles.content}>
         <Animated.View
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: "100%",
-    backgroundColor: "#007AFF",
+    backgroundColor: "#6200ee",
     borderRadius: 3,
   },
   aiFab: {
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: "#007AFF",
+    backgroundColor: "#6200ee",
     justifyContent: "center",
     alignItems: "center",
     elevation: 4,

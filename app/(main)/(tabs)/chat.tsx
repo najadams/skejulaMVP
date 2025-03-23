@@ -103,7 +103,7 @@ export default function ChatScreen() {
     <View style={styles.header}>
       <Text style={styles.title}>Messages</Text>
       <TouchableOpacity style={styles.newChatButton}>
-        <Ionicons name="create-outline" size={24} color="#007AFF" />
+        <Ionicons name="create-outline" size={24} color="#2C3E50" />
       </TouchableOpacity>
     </View>
   );
@@ -113,7 +113,7 @@ export default function ChatScreen() {
       <Ionicons
         name="search"
         size={20}
-        color="#8E8E93"
+        color="#95A5A6"
         style={styles.searchIcon}
       />
       <TextInput
@@ -121,11 +121,11 @@ export default function ChatScreen() {
         placeholder="Search chats..."
         value={searchQuery}
         onChangeText={setSearchQuery}
-        placeholderTextColor="#8E8E93"
+        placeholderTextColor="#95A5A6"
       />
       {searchQuery.length > 0 && (
         <TouchableOpacity onPress={() => setSearchQuery("")}>
-          <Ionicons name="close-circle" size={20} color="#8E8E93" />
+          <Ionicons name="close-circle" size={20} color="#95A5A6" />
         </TouchableOpacity>
       )}
     </View>
@@ -157,7 +157,7 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F2F2F7",
+    backgroundColor: "#F5F6FA",
   },
   header: {
     flexDirection: "row",
@@ -166,12 +166,12 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: "#FFFFFF",
     borderBottomWidth: 1,
-    borderBottomColor: "#F2F2F7",
+    borderBottomColor: "#E8E8E8",
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#000000",
+    color: "#2C3E50",
   },
   newChatButton: {
     padding: 8,
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#E5E5EA",
+    borderColor: "#E8E8E8",
   },
   searchIcon: {
     marginRight: 8,
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: "#000000",
+    color: "#2C3E50",
   },
   listContent: {
     paddingBottom: 16,

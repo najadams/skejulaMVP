@@ -12,7 +12,7 @@ import {
   Image,
   Animated,
   Keyboard,
-  Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -22,8 +22,8 @@ interface Message {
   text: string;
   sender: "user" | "other";
   timestamp: string;
+  status?: "sending" | "sent" | "delivered" | "read";
   type?: "text" | "image" | "file";
-  status?: "sent" | "delivered" | "read";
 }
 
 // Mock messages for the chat
@@ -57,9 +57,12 @@ export default function ChatDetailScreen() {
   const [messages, setMessages] = useState<Message[]>(mockMessages);
   const [newMessage, setNewMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const flatListRef = useRef<FlatList>(null);
   const inputHeight = useRef(new Animated.Value(40)).current;
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
 
   const handleSend = () => {
     if (newMessage.trim()) {
@@ -71,7 +74,7 @@ export default function ChatDetailScreen() {
           hour: "2-digit",
           minute: "2-digit",
         }),
-        status: "sent",
+        status: "sending",
       };
       setMessages([...messages, message]);
       setNewMessage("");
@@ -86,7 +89,16 @@ export default function ChatDetailScreen() {
       }).start();
 
       // Dismiss keyboard
-      // Keyboard.dismiss();
+      Keyboard.dismiss();
+
+      // Simulate message sending
+      setTimeout(() => {
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.id === message.id ? { ...msg, status: "sent" } : msg
+          )
+        );
+      }, 1000);
 
       flatListRef.current?.scrollToEnd({ animated: true });
     }
@@ -123,17 +135,23 @@ export default function ChatDetailScreen() {
         <View style={styles.messageFooter}>
           <Text style={styles.timestamp}>{item.timestamp}</Text>
           {item.sender === "user" && item.status && (
-            <Ionicons
-              name={
-                item.status === "read"
-                  ? "checkmark-done"
-                  : item.status === "delivered"
-                  ? "checkmark-done-outline"
-                  : "checkmark"
-              }
-              size={16}
-              color={item.status === "read" ? "#007AFF" : "#8E8E93"}
-            />
+            <View style={styles.statusContainer}>
+              {item.status === "sending" ? (
+                <ActivityIndicator size={12} color="#8E8E93" />
+              ) : (
+                <Ionicons
+                  name={
+                    item.status === "read"
+                      ? "checkmark-done"
+                      : item.status === "delivered"
+                      ? "checkmark-done-outline"
+                      : "checkmark"
+                  }
+                  size={16}
+                  color={item.status === "read" ? "#4FC3F7" : "#8E8E93"}
+                />
+              )}
+            </View>
           )}
         </View>
       </View>
@@ -144,7 +162,6 @@ export default function ChatDetailScreen() {
     setNewMessage(text);
     setIsTyping(text.length > 0);
 
-    // Calculate the height based on content
     const lines = text.split("\n").length;
     const newHeight = Math.min(Math.max(40, lines * 20 + 20), 120);
 
@@ -156,7 +173,6 @@ export default function ChatDetailScreen() {
     }).start();
   };
 
-  // Handle keyboard events
   useEffect(() => {
     const keyboardWillShow = Keyboard.addListener(
       Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
@@ -179,13 +195,34 @@ export default function ChatDetailScreen() {
     };
   }, []);
 
+  const renderAttachmentMenu = () => (
+    <View style={styles.attachmentMenu}>
+      <TouchableOpacity style={styles.attachmentOption}>
+        <Ionicons name="camera" size={24} color="#007AFF" />
+        <Text style={styles.attachmentText}>Camera</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.attachmentOption}>
+        <Ionicons name="image" size={24} color="#007AFF" />
+        <Text style={styles.attachmentText}>Gallery</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.attachmentOption}>
+        <Ionicons name="document" size={24} color="#007AFF" />
+        <Text style={styles.attachmentText}>Document</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.attachmentOption}>
+        <Ionicons name="location" size={24} color="#007AFF" />
+        <Text style={styles.attachmentText}>Location</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
           style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#007AFF" />
+          <Ionicons name="chevron-back" size={24} color="#2C3E50" />
         </TouchableOpacity>
         <View style={styles.headerInfo}>
           <View style={styles.headerTop}>
@@ -202,7 +239,7 @@ export default function ChatDetailScreen() {
           </View>
         </View>
         <TouchableOpacity style={styles.moreButton}>
-          <Ionicons name="ellipsis-vertical" size={24} color="#007AFF" />
+          <Ionicons name="ellipsis-vertical" size={24} color="#2C3E50" />
         </TouchableOpacity>
       </View>
 
@@ -227,9 +264,14 @@ export default function ChatDetailScreen() {
         />
 
         <View style={styles.inputContainer}>
-          <TouchableOpacity style={styles.attachButton}>
-            <Ionicons name="add-circle" size={24} color="#007AFF" />
+          <TouchableOpacity
+            style={styles.attachButton}
+            onPress={() => setShowAttachmentMenu(!showAttachmentMenu)}>
+            <Ionicons name="add-circle" size={24} color="#2C3E50" />
           </TouchableOpacity>
+
+          {showAttachmentMenu && renderAttachmentMenu()}
+
           <Animated.View
             style={[
               styles.inputWrapper,
@@ -244,11 +286,12 @@ export default function ChatDetailScreen() {
               value={newMessage}
               onChangeText={handleInputChange}
               placeholder="Type a message..."
-              placeholderTextColor="#8E8E93"
+              placeholderTextColor="#95A5A6"
               multiline
               textAlignVertical="center"
             />
           </Animated.View>
+
           <TouchableOpacity
             style={[
               styles.sendButton,
@@ -259,7 +302,7 @@ export default function ChatDetailScreen() {
             <Ionicons
               name="send"
               size={24}
-              color={newMessage.trim() ? "#007AFF" : "#8E8E93"}
+              color={newMessage.trim() ? "#2C3E50" : "#95A5A6"}
             />
           </TouchableOpacity>
         </View>
@@ -271,7 +314,7 @@ export default function ChatDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F2F2F7",
+    backgroundColor: "#F5F6FA",
   },
   header: {
     flexDirection: "row",
@@ -279,7 +322,7 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: "#FFFFFF",
     borderBottomWidth: 1,
-    borderBottomColor: "#E5E5EA",
+    borderBottomColor: "#E8E8E8",
   },
   backButton: {
     padding: 8,
@@ -301,11 +344,11 @@ const styles = StyleSheet.create({
   headerName: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#000000",
+    color: "#2C3E50",
   },
   headerStatus: {
     fontSize: 14,
-    color: "#8E8E93",
+    color: "#95A5A6",
   },
   moreButton: {
     padding: 8,
@@ -343,7 +386,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   userBubble: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#2C3E50",
     borderBottomRightRadius: 4,
   },
   otherBubble: {
@@ -357,7 +400,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   otherMessageText: {
-    color: "#000000",
+    color: "#2C3E50",
   },
   messageFooter: {
     flexDirection: "row",
@@ -367,30 +410,55 @@ const styles = StyleSheet.create({
   },
   timestamp: {
     fontSize: 12,
-    color: "#8E8E93",
+    color: "#95A5A6",
+  },
+  statusContainer: {
+    marginLeft: 4,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "flex-end",
-    padding: 16,
+    padding: 12,
     backgroundColor: "#FFFFFF",
     borderTopWidth: 1,
-    borderTopColor: "#E5E5EA",
-    paddingBottom: Platform.OS === "ios" ? 16 : 8,
+    borderTopColor: "#E8E8E8",
+    paddingBottom: Platform.OS === "ios" ? 12 : 8,
   },
   attachButton: {
     padding: 8,
     marginBottom: 8,
   },
+  attachmentMenu: {
+    position: "absolute",
+    bottom: "100%",
+    left: 0,
+    right: 0,
+    backgroundColor: "#FFFFFF",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#E8E8E8",
+  },
+  attachmentOption: {
+    alignItems: "center",
+  },
+  attachmentText: {
+    fontSize: 12,
+    color: "#2C3E50",
+    marginTop: 4,
+  },
   inputWrapper: {
     flex: 1,
     marginHorizontal: 8,
-    backgroundColor: "#F2F2F7",
+    backgroundColor: "#F5F6FA",
     borderRadius: 20,
     overflow: "hidden",
-    justifyContent: "center",
+    flexDirection: "row",
+    alignItems: "center",
   },
   input: {
+    flex: 1,
     padding: 12,
     fontSize: 16,
     lineHeight: 20,
