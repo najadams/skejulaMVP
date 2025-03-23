@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -13,9 +14,11 @@ import { useRouter } from "expo-router";
 import { getAuth, signOut } from "firebase/auth";
 import { MenuItemProps, Language } from "../../types/menu";
 import { LanguageModal } from "../../components/LanguageModal";
+import { useUser } from "@/context/UserContext";
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const user = useUser();
   const [isLanguageModalVisible, setIsLanguageModalVisible] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState("en");
 
@@ -47,15 +50,25 @@ export default function ProfileScreen() {
     </TouchableOpacity>
   );
 
+  if (!user) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <ActivityIndicator size="large" color="#007AFF" />
+      </View>
+    );
+  }
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Image
-          source={{ uri: "https://randomuser.me/api/portraits/men/1.jpg" }}
+          source={{
+            uri: user.profilePicture || "assets/images/avatar.jpg",
+          }}
           style={styles.profileImage}
         />
-        <Text style={styles.name}>John Doe</Text>
-        <Text style={styles.email}>john.doe@example.com</Text>
+        <Text style={styles.name}>{user.name}</Text>
+        <Text style={styles.email}>{user.email}</Text>
       </View>
 
       <View style={styles.section}>
@@ -63,7 +76,7 @@ export default function ProfileScreen() {
         <MenuItem
           icon="person-outline"
           title="Edit Profile"
-          onPress={() => {}}
+          onPress={() => router.push("/(main)/profile/edit")}
         />
         <MenuItem
           icon="notifications-outline"
@@ -133,6 +146,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F2F2F7",
+  },
+  loadingContainer: {
+    justifyContent: "center",
+    alignItems: "center",
   },
   header: {
     alignItems: "center",

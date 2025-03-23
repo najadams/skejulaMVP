@@ -10,13 +10,14 @@ import {
   SafeAreaView,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useUser } from "@/context/UserContext";
+import { useUser, useSetUser } from "@/context/UserContext";
 import { useRouter } from "expo-router";
 import { auth } from "@/firebaseConfig";
 import { signOut } from "firebase/auth";
 
 const Settings = () => {
-  const { user, setUser } = useUser();
+  const user = useUser()
+  const setUser = useSetUser()
   const router = useRouter();
 
   const handleLogout = async () => {
